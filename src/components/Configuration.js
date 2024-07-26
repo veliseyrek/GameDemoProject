@@ -54,7 +54,7 @@ const Configuration = () => {
       }
 
       try {
-        const response = await axios.get('https://localhost:7294/api/configurations', {
+        const response = await axios.get('http://localhost:7294/api/configurations', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
