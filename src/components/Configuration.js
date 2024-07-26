@@ -28,11 +28,10 @@ const Configuration = () => {
   const [buildingType, setBuildingType] = useState('');
   const [buildingCost, setBuildingCost] = useState('');
   const [constructionTime, setConstructionTime] = useState('');
-  const [types, setTypes] = useState(['Farm', 'Academy', 'Headquarters', 'LumberMill', 'Barracks']);
+  const [types] = useState(['Farm', 'Academy', 'Headquarters', 'LumberMill', 'Barracks']);
   const [addedTypes, setAddedTypes] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -61,7 +60,6 @@ const Configuration = () => {
           },
         });
         setConfigs(response.data);
-        setLoading(false);
       } catch (error) {
         navigate('/login');
       }
