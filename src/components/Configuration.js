@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -16,22 +15,28 @@ import {
   IconButton,
   Box,
   Paper,
-} from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { getConfigurations, addConfiguration, deleteConfiguration } from '../services/api';
-import { Delete, AddCircleOutline, Logout } from '@mui/icons-material';
-import '../assets/configuration.css';
+} from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import {
+  getConfigurations,
+  addConfiguration,
+  deleteConfiguration,
+  getConfigurationsForConfig
+} from "../services/api";
+import { Delete, AddCircleOutline, Logout } from "@mui/icons-material";
+import "../assets/configuration.css";
 
 const Configuration = () => {
   const [configs, setConfigs] = useState([]);
   const [open, setOpen] = useState(false);
-  const [buildingType, setBuildingType] = useState('');
-  const [buildingCost, setBuildingCost] = useState('');
-  const [constructionTime, setConstructionTime] = useState('');
-  const [types] = useState(['Farm', 'Academy', 'Headquarters', 'LumberMill', 'Barracks']);
+  const [buildingType, setBuildingType] = useState("");
+  const [buildingCost, setBuildingCost] = useState("");
+  const [constructionTime, setConstructionTime] = useState("");
+  const types = ["Farm", "Academy", "Headquarters", "LumberMill", "Barracks"];
+
   const [addedTypes, setAddedTypes] = useState([]);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,29 +44,25 @@ const Configuration = () => {
       try {
         const data = await getConfigurations();
         setConfigs(data);
-        setAddedTypes(data.map(config => config.buildingType));
+        setAddedTypes(data.map((config) => config.buildingType));
       } catch (error) {
-        console.error(error);
+        showError(error);
       }
     };
 
     const fetchData = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
 
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
 
       try {
-        const response = await axios.get('https://veliseyrek-001-site1.ktempurl.com/api/configurations', {
-          headers: {
-            Authorization: 'Basic MTExODc5Njg6NjAtZGF5ZnJlZXRyaWFs'
-          },
-        });
+        const response = await getConfigurationsForConfig();
         setConfigs(response.data);
       } catch (error) {
-        navigate('/login');
+        navigate("/login");
       }
     };
 
@@ -71,89 +72,109 @@ const Configuration = () => {
 
   const handleAddConfig = async () => {
     if (buildingCost <= 0) {
-      showError('Building cost must be a positive number.');
+      showError("Building cost must be a positive number.");
       return;
     }
     if (constructionTime < 30 || constructionTime > 1800) {
-      showError('Construction time must be between 30 and 1800 seconds.');
+      showError("Construction time must be between 30 and 1800 seconds.");
       return;
     }
     if (!types.includes(buildingType)) {
-      showError('Selected building type is not valid.');
+      showError("Selected building type is not valid.");
       return;
     }
 
     const newConfig = { buildingType, buildingCost, constructionTime };
     try {
-      await addConfiguration(newConfig);
-      setConfigs([...configs, newConfig]);
+      const result = await addConfiguration(newConfig);
+      setConfigs([...configs, result]);
       setAddedTypes([...addedTypes, buildingType]);
-      setBuildingType('');
-      setBuildingCost('');
-      setConstructionTime('');
+      setBuildingType("");
+      setBuildingCost("");
+      setConstructionTime("");
       setOpen(false);
-      showSuccess('Configuration added successfully.');
+      showSuccess("Configuration added successfully.");
     } catch (error) {
-      console.error(error);
+      showError(error);
     }
   };
 
-  const handleDeleteConfig = async id => {
+  const handleDeleteConfig = async (id) => {
     try {
       await deleteConfiguration(id);
 
-      const deletedConfig = configs.find(config => config.id === id);
+      const deletedConfig = configs.find((config) => config.id === id);
 
       if (deletedConfig) {
-        setAddedTypes(addedTypes.filter(type => type !== deletedConfig.buildingType));
+        setAddedTypes(
+          addedTypes.filter((type) => type !== deletedConfig.buildingType)
+        );
       }
 
-      setConfigs(configs.filter(config => config.id !== id));
-      showSuccess('Configuration deleted successfully.');
+      setConfigs(configs.filter((config) => config.id !== id));
+      showSuccess("Configuration deleted successfully.");
     } catch (error) {
       console.error(error);
-      showError('Failed to delete configuration.');
+      showError("Failed to delete configuration.");
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
-  const showError = message => {
+  const showError = (message) => {
     setErrorMessage(message);
     setTimeout(() => {
-      setErrorMessage('');
+      setErrorMessage("");
     }, 5000);
   };
 
-  const showSuccess = message => {
+  const showSuccess = (message) => {
     setSuccessMessage(message);
     setTimeout(() => {
-      setSuccessMessage('');
+      setSuccessMessage("");
     }, 5000);
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  // const handleClickOpen = () => {
+  //   setOpen(true);
+  // };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  // const handleClose = () => {
+  //   setOpen(false);
+  // };
 
   const columns = [
-    { field: 'buildingType', headerName: 'Building Type', flex: 1, headerClassName: 'header-style' },
-    { field: 'buildingCost', headerName: 'Building Cost', flex: 1, headerClassName: 'header-style' },
-    { field: 'constructionTime', headerName: 'Construction Time', flex: 1, headerClassName: 'header-style' },
     {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "buildingType",
+      headerName: "Building Type",
+      flex: 1,
+      headerClassName: "header-style",
+    },
+    {
+      field: "buildingCost",
+      headerName: "Building Cost",
+      flex: 1,
+      headerClassName: "header-style",
+    },
+    {
+      field: "constructionTime",
+      headerName: "Construction Time",
+      flex: 1,
+      headerClassName: "header-style",
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
       flex: 0.5,
       sortable: false,
-      renderCell: params => (
-        <IconButton color="error" onClick={() => handleDeleteConfig(params.row.id)}>
+      renderCell: (params) => (
+        <IconButton
+          color="error"
+          onClick={() => handleDeleteConfig(params.row.id)}
+        >
           <Delete />
         </IconButton>
       ),
@@ -166,41 +187,71 @@ const Configuration = () => {
   }));
 
   return (
-    <Container maxWidth="md" style={{ backgroundImage: 'url("/path/to/your/background.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', minHeight: '100vh' }}>
+    <Container
+      maxWidth="md"
+      style={{
+        backgroundImage: 'url("/path/to/your/background.jpg")',
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        minHeight: "100vh",
+      }}
+    >
       <Box sx={{ pt: 5, pb: 2 }}>
-        <Paper elevation={3} sx={{ p: 4, backdropFilter: 'blur(10px)', backgroundColor: 'rgba(255, 255, 255, 0.8)' }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+          }}
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
             <Typography variant="h4" gutterBottom>
               Configuration
             </Typography>
-            <Button variant="contained" color="secondary" onClick={handleLogout} startIcon={<Logout />}>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleLogout}
+              startIcon={<Logout />}
+            >
               Logout
             </Button>
           </Box>
           <Box display="flex" justifyContent="flex-end" mb={3}>
-            <Button variant="contained" color="primary" onClick={handleClickOpen} startIcon={<AddCircleOutline />}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setOpen(true)}
+              startIcon={<AddCircleOutline />}
+            >
               Add Configuration
             </Button>
           </Box>
-          <div style={{ height: 400, width: '100%' }}>
+          <div style={{ height: 400, width: "100%" }}>
             <DataGrid
               rows={rows}
               columns={columns}
               pageSize={5}
               disableSelectionOnClick
               sx={{
-                '& .MuiDataGrid-row': {
-                  transition: 'all 0.3s ease',
+                "& .MuiDataGrid-row": {
+                  transition: "all 0.3s ease",
                 },
-                '& .MuiDataGrid-row:hover': {
-                  transform: 'scale(1.02)',
+                "& .MuiDataGrid-row:hover": {
+                  transform: "scale(1.02)",
                 },
               }}
             />
           </div>
         </Paper>
       </Box>
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Add New Configuration</DialogTitle>
         <DialogContent>
           <TextField
@@ -209,13 +260,15 @@ const Configuration = () => {
             fullWidth
             margin="normal"
             value={buildingType}
-            onChange={e => setBuildingType(e.target.value)}
+            onChange={(e) => setBuildingType(e.target.value)}
           >
-            {types.filter(type => !addedTypes.includes(type)).map(type => (
-              <MenuItem key={type} value={type}>
-                {type}
-              </MenuItem>
-            ))}
+            {types
+              .filter((type) => !addedTypes.includes(type))
+              .map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
           </TextField>
           <TextField
             label="Building Cost"
@@ -223,7 +276,7 @@ const Configuration = () => {
             fullWidth
             margin="normal"
             value={buildingCost}
-            onChange={e => setBuildingCost(e.target.value)}
+            onChange={(e) => setBuildingCost(e.target.value)}
           />
           <TextField
             label="Construction Time (seconds)"
@@ -231,11 +284,11 @@ const Configuration = () => {
             fullWidth
             margin="normal"
             value={constructionTime}
-            onChange={e => setConstructionTime(e.target.value)}
+            onChange={(e) => setConstructionTime(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
-          <Button variant="outlined" onClick={handleClose} color="primary">
+          <Button variant="outlined" onClick={() => setOpen(false)} color="primary">
             Cancel
           </Button>
           <Button variant="contained" onClick={handleAddConfig} color="primary">
@@ -244,12 +297,20 @@ const Configuration = () => {
         </DialogActions>
       </Dialog>
       {errorMessage && (
-        <Snackbar open autoHideDuration={3000} onClose={() => setErrorMessage('')}>
+        <Snackbar
+          open
+          autoHideDuration={3000}
+          onClose={() => setErrorMessage("")}
+        >
           <Alert severity="error">{errorMessage}</Alert>
         </Snackbar>
       )}
       {successMessage && (
-        <Snackbar open autoHideDuration={3000} onClose={() => setSuccessMessage('')}>
+        <Snackbar
+          open
+          autoHideDuration={3000}
+          onClose={() => setSuccessMessage("")}
+        >
           <Alert severity="success">{successMessage}</Alert>
         </Snackbar>
       )}
