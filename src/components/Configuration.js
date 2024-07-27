@@ -137,7 +137,6 @@ const Configuration = () => {
       setSuccessMessage("");
     }, 5000);
   };
-
   const columns = [
     {
       field: "buildingType",
