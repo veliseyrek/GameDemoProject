@@ -138,14 +138,6 @@ const Configuration = () => {
     }, 5000);
   };
 
-  // const handleClickOpen = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
-
   const columns = [
     {
       field: "buildingType",
