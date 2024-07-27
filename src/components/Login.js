@@ -45,6 +45,7 @@ const Login = () => {
     }
 
     try {
+      debugger;
       const response = await login(username, password);
       localStorage.setItem('token', response.token);
       navigate('/configuration'); 
