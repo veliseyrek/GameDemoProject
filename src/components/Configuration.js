@@ -54,11 +54,7 @@ const Configuration = () => {
       }
 
       try {
-        const response = await axios.get('http://veliseyrek-001-site1.ktempurl.com/api/configurations', {
-          headers: {
-            Authorization: 'Basic MTExODc5Njg6NjAtZGF5ZnJlZXRyaWFs'
-          },
-        });
+        const response = await getConfigurations();
         setConfigs(response.data);
       } catch (error) {
         navigate('/login');
