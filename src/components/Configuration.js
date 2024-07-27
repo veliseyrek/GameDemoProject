@@ -54,7 +54,7 @@ const Configuration = () => {
       }
 
       try {
-        const response = await axios.get('http://veliseyrek-001-site1.ktempurl.com/api/configurations', {
+        const response = await axios.get('https://localhost:7294/api/configurations', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
